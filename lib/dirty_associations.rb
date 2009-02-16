@@ -20,7 +20,7 @@ module DirtyAssociations
           end
           
           def #{association}_changed?
-            @#{association}_changed.present?
+            !@#{association}_changed.blank?
           end
           
           def #{association}_was
