@@ -1,0 +1,6 @@
+._*
+.DS_Store
+*.orig
+Thumbs.db
+*.sqlite3.db
+*.log
