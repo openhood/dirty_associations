@@ -8,8 +8,8 @@ module DirtyAssociations
 
     # initial setup of dirty associations
     def dirty_associations(*associations)
-      @@dirty_associations = associations || []
-      @@dirty_associations.each do |association|
+      write_inheritable_attribute :dirty_associations, associations || []
+      inheritable_attributes[:dirty_associations].each do |association|
         add_association_callbacks(association, {:before_add => "add_or_remove_#{association}".to_sym, :before_remove => "add_or_remove_#{association}".to_sym})
         self.class_eval <<-eos # instance methods
           def add_or_remove_#{association}(child) # called when an associated object is added or removed
@@ -33,7 +33,7 @@ module DirtyAssociations
       after_save :clear_dirty_associations
       self.class_eval do # instance methods
         def clear_dirty_associations
-          @@dirty_associations.each do |association|
+          inheritable_attributes[:dirty_associations].each do |association|
             self.instance_eval <<-eos
               @#{association}_changed = nil
               @#{association}_was = nil
