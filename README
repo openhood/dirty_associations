@@ -1,11 +1,23 @@
-= Skip Stamp
+= Dirty Associations
 
-Thread-safe way to avoid automatic overriding of created_at, created_on, updated_at and updated_on fields.
+Simple plugin to track changes in associations. Fully working, with proper specs to prove it, tested under Rails 2.1, 2.2 and 2.3
 
 == Example
 
-def Chickens < ActiveRecord::Base
-  def updated_one_week_ago
-    skip_stamp{update_attribute :updated_at, 1.week.ago}
-  end
+class MommyChicken < ActiveRecord::Base
+  has_many :little_chickens
+  dirty_associations :little_chickens
 end
+class LittleChicken < ActiveRecord::Base
+end
+
+and then you can do:
+
+@mommy = MommyChicken.create(:name => "Gertrude")
+@mommy.little_chickens.build(:name => "Junior")
+@mommy.little_chickens_changed? -> true
+@mommy.little_chickens_was -> []
+
+Does now also mixin with ActiveRecord::Dirty to override changed, changed?, changes, and reload_with_dirty
+
+Enjoy!

@@ -128,6 +128,22 @@ describe MommyChicken do
       @mommy.little_chickens_was.should_not == @mommy.little_chickens
     end
 
+    it "mommy changed? should be true" do
+      @mommy.changed?.should == true
+    end
+
+    it "mommy changed should be [\"little_chickens\"]" do
+      @mommy.changed.should == ["little_chickens"]
+    end
+
+    it "mommy changes should return proper value" do
+      @mommy.changes.should == {"little_chickens" => [@little_chickens_was, @mommy.little_chickens]}
+    end
+
+    it "mommy reload_with_dirty should not be changed?" do
+      @mommy.reload_with_dirty.changed?.should == false
+    end
+
     it "little_chicken_changed? should be false after save" do
       @mommy.save
       @mommy.little_chickens_changed?.should == false
