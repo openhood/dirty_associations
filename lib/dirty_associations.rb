@@ -5,7 +5,7 @@ module DirtyAssociations
   end
   
   module Macro # class methods
-
+    
     # initial setup of dirty associations
     def dirty_associations(*associations)
       associations ||= []
@@ -38,9 +38,30 @@ module DirtyAssociations
         eos
       end
 
-      # clear dirty associations after each save
-      after_save :clear_dirty_associations
       self.class_eval do # instance methods
+
+        def save_with_dirty_association(*args)
+          if status = save_without_dirty_association(*args)
+            clear_dirty_associations
+          end
+          status
+        end
+        
+        def save_with_dirty_association!(*args)
+          status = save_without_dirty_association!(*args)
+          clear_dirty_associations.clear
+          status
+        end
+        
+        def reload_with_dirty_association(*args)
+          record = reload_without_dirty_association(*args)
+          clear_dirty_associations
+          record
+        end
+        
+        alias_method_chain :save,             :dirty_association
+        alias_method_chain :save!,            :dirty_association
+        alias_method_chain :reload,           :dirty_association
 
       public
 
@@ -60,6 +81,15 @@ module DirtyAssociations
         def reload_with_dirty(*args)
           clear_dirty_associations
           super
+        end
+        
+        # Attempts to +save+ the record and clears changed attributes if successful.
+        def save_with_dirty(*args) #:nodoc:
+          if status = save_without_dirty(*args)
+            changed_attributes.clear
+            clear_dirty_associations
+          end
+          status
         end
 
       private
